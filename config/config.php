@@ -133,4 +133,22 @@ function delete_file($file_path) {
     }
     return false;
 }
+
+// Generate clean URL for router
+function route($path) {
+    return SITE_URL . $path;
+}
+
+// Get current route
+function current_route() {
+    $request_uri = $_SERVER['REQUEST_URI'];
+    $base_path = parse_url(SITE_URL, PHP_URL_PATH);
+    $route = str_replace($base_path, '', parse_url($request_uri, PHP_URL_PATH));
+    return '/' . trim($route, '/');
+}
+
+// Check if current route matches
+function is_current_route($route) {
+    return current_route() === $route;
+}
 ?>

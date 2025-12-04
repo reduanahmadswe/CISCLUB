@@ -6,6 +6,16 @@ include __DIR__ . '/includes/header.php';
 
 <?php
 
+// Fetch stats from database
+$stats_query = "SELECT 
+    (SELECT COUNT(*) FROM users WHERE status = 'active') as active_members,
+    (SELECT COUNT(*) FROM events) as total_events";
+$stats_result = db_query($stats_query);
+$stats = db_fetch($stats_result);
+
+$active_members = $stats['active_members'] ?? 0;
+$total_events = $stats['total_events'] ?? 0;
+
 // Fetch upcoming events
 $events_query = "SELECT e.*, c.category_name 
                  FROM events e 
@@ -28,29 +38,206 @@ $sponsors = db_fetch_all($sponsors_result);
 ?>
 
 <!-- Hero Section -->
-<section class="hero-section bg-primary text-white py-5">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h1 class="display-4 fw-bold mb-4">Welcome to DIU CIS Club</h1>
-                <p class="lead mb-4">Join us in exploring the world of Computing & Information Systems. Learn, grow, and innovate with like-minded tech enthusiasts.</p>
-                <div class="d-flex gap-3">
+<section class="hero-section text-white position-relative" style="min-height: 100vh; overflow: hidden; display: flex; align-items: center;">
+    <!-- Background Image with Overlay -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 0;">
+        <img src="<?php echo SITE_URL; ?>/assets/images/hero-illustration.png?v=<?php echo time(); ?>" 
+             alt="CIS Club Background" 
+             class="w-100 h-100" 
+             style="object-fit: cover; opacity: 0.5; filter: brightness(0.9);" 
+             onerror="this.parentElement.style.background='linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%)'">
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.5) 0%, rgba(139, 92, 246, 0.45) 50%, rgba(236, 72, 153, 0.4) 100%);"></div>
+    </div>
+    
+    <!-- Animated Particles -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="z-index: 0; pointer-events: none;">
+        <div class="hero-particle" style="top: 10%; left: 10%;"></div>
+        <div class="hero-particle" style="top: 20%; right: 15%; animation-delay: 1s;"></div>
+        <div class="hero-particle" style="bottom: 30%; left: 20%; animation-delay: 2s;"></div>
+        <div class="hero-particle" style="bottom: 20%; right: 10%; animation-delay: 1.5s;"></div>
+        <div class="hero-particle" style="top: 60%; left: 5%; animation-delay: 0.5s;"></div>
+        <div class="hero-particle" style="top: 40%; right: 25%; animation-delay: 2.5s;"></div>
+    </div>
+    
+    <!-- Content -->
+    <div class="container position-relative" style="z-index: 1;">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-lg-10 col-md-11 mx-auto text-center">
+                <!-- Badge -->
+                <div class="mb-4" data-aos="fade-down">
+                    <span class="badge rounded-pill px-4 py-2" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); font-size: 1rem; font-weight: 500;">
+                        <i class="fas fa-star me-2"></i>Welcome to DIU Computing & Information System Club
+                    </span>
+                </div>
+                
+                <!-- Main Heading -->
+                <h1 class="display-2 fw-bold mb-4" data-aos="fade-up" data-aos-delay="100" style="text-shadow: 2px 4px 12px rgba(0,0,0,0.3); line-height: 1.2;">
+                    Building Future Tech Leaders
+                </h1>
+                
+                <!-- Subheading -->
+                <p class="lead mb-5 fs-3 mx-auto" data-aos="fade-up" data-aos-delay="200" style="max-width: 800px; text-shadow: 1px 2px 8px rgba(0,0,0,0.2);">
+                    Join us in exploring the world of Computing & Information Systems. Learn, grow, and innovate with like-minded tech enthusiasts.
+                </p>
+                
+                <!-- CTA Buttons -->
+                <div class="d-flex gap-3 justify-content-center flex-wrap mb-5" data-aos="fade-up" data-aos-delay="300">
                     <?php if (!is_logged_in()): ?>
-                        <a href="<?php echo SITE_URL; ?>/auth/register.php" class="btn btn-light btn-lg">
-                            <i class="fas fa-user-plus"></i> Join Now
+                        <a href="<?php echo SITE_URL; ?>/auth/register.php" class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow-lg hero-btn">
+                            <i class="fas fa-user-plus me-2"></i> Join Now
                         </a>
                     <?php endif; ?>
-                    <a href="<?php echo SITE_URL; ?>/pages/events.php" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-calendar"></i> View Events
+                    <a href="<?php echo SITE_URL; ?>/pages/events.php" class="btn btn-outline-light btn-lg px-5 py-3 rounded-pill shadow-lg hero-btn-outline">
+                        <i class="fas fa-calendar me-2"></i> Explore Events
                     </a>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <img src="<?php echo SITE_URL; ?>/assets/images/hero-illustration.svg" alt="CIS Club" class="img-fluid">
+                
+                <!-- Stats Cards -->
+                <div class="row g-4 mt-5 pt-3" data-aos="fade-up" data-aos-delay="400">
+                    <div class="col-md-4">
+                        <div class="stat-card p-4 rounded-4" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <div class="stat-icon mb-3">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <h2 class="display-4 fw-bold mb-1 counter" data-target="<?php echo $active_members; ?>">0</h2>
+                            <p class="mb-0 fs-5 opacity-90">Active Members</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card p-4 rounded-4" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <div class="stat-icon mb-3">
+                                <i class="fas fa-calendar-check fa-2x"></i>
+                            </div>
+                            <h2 class="display-4 fw-bold mb-1 counter" data-target="<?php echo $total_events; ?>">0</h2>
+                            <p class="mb-0 fs-5 opacity-90">Events Organized</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card p-4 rounded-4" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <div class="stat-icon mb-3">
+                                <i class="fas fa-trophy fa-2x"></i>
+                            </div>
+                            <h2 class="display-4 fw-bold mb-1">100%</h2>
+                            <p class="mb-0 fs-5 opacity-90">Student Satisfaction</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="position-absolute bottom-0 start-50 translate-middle-x mb-4" style="z-index: 1; animation: bounce 2s infinite;">
+        <i class="fas fa-chevron-down fa-2x opacity-75"></i>
+    </div>
 </section>
+
+<style>
+/* Hero Button Styles */
+.hero-btn {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.hero-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 255, 255, 0.4) !important;
+    background: white !important;
+    color: #6366f1 !important;
+}
+
+.hero-btn-outline {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.hero-btn-outline:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 255, 255, 0.3) !important;
+    background: white !important;
+    color: #6366f1 !important;
+    border-color: white !important;
+}
+
+/* Stat Cards */
+.stat-card {
+    transition: all 0.4s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.stat-icon {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Particles */
+.hero-particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    animation: float-particle 4s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes float-particle {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translateY(-30px) scale(1.2);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.5rem !important;
+    }
+    .hero-section .lead {
+        font-size: 1.1rem !important;
+    }
+}
+</style>
+
+<!-- AOS Library for scroll animations -->
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 1000,
+        once: true
+    });
+</script>
 
 <!-- Quick Actions -->
 <section class="py-5">
@@ -111,7 +298,11 @@ $sponsors = db_fetch_all($sponsors_result);
                     <div class="col-md-4">
                         <div class="card border-0 shadow-sm h-100">
                             <?php if ($event['image']): ?>
-                                <img src="<?php echo UPLOAD_URL . $event['image']; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($event['event_name']); ?>" style="height: 200px; object-fit: cover;">
+                                <?php 
+                                // Check if image is full URL or relative path
+                                $image_url = (strpos($event['image'], 'http') === 0) ? $event['image'] : UPLOAD_URL . $event['image'];
+                                ?>
+                                <img src="<?php echo $image_url; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($event['event_name']); ?>" style="height: 200px; object-fit: cover;" onerror="this.parentElement.innerHTML='<div class=\'bg-secondary text-white d-flex align-items-center justify-content-center\' style=\'height: 200px;\'><i class=\'fas fa-calendar fa-3x\'></i></div>'">
                             <?php else: ?>
                                 <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
                                     <i class="fas fa-calendar fa-3x"></i>

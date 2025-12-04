@@ -1,7 +1,7 @@
     </main>
     
-    <!-- Fixed Footer -->
-    <footer class="footer bg-dark text-white py-4">
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white py-4 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-3">

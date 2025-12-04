@@ -1,181 +1,226 @@
-// Main JavaScript for DIU CIS Club Portal
+// Modern JavaScript for DIU CIS Club Portal
 
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // Navbar scroll effect
+// Navbar Scroll Effect
+window.addEventListener('scroll', function() {
     const navbar = document.querySelector('.navbar');
-    let lastScroll = 0;
+    if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+});
+
+// Smooth Scroll Reveal Animation
+function reveal() {
+    const reveals = document.querySelectorAll('.reveal');
     
-    window.addEventListener('scroll', () => {
-        const currentScroll = window.pageYOffset;
+    for (let i = 0; i < reveals.length; i++) {
+        const windowHeight = window.innerHeight;
+        const elementTop = reveals[i].getBoundingClientRect().top;
+        const elementVisible = 150;
         
-        // Add shadow on scroll
-        if (currentScroll > 10) {
-            navbar.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.25)';
-        } else {
-            navbar.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+        if (elementTop < windowHeight - elementVisible) {
+            reveals[i].classList.add('active');
         }
-        
-        lastScroll = currentScroll;
+    }
+}
+
+window.addEventListener('scroll', reveal);
+
+// Initial reveal check on page load
+document.addEventListener('DOMContentLoaded', function() {
+    reveal();
+    
+    // Add reveal class to cards and sections
+    const cards = document.querySelectorAll('.card');
+    const sections = document.querySelectorAll('section');
+    
+    cards.forEach(card => {
+        card.classList.add('reveal');
     });
     
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-        const navbarCollapse = document.querySelector('.navbar-collapse');
-        const navbarToggler = document.querySelector('.navbar-toggler');
-        
-        if (navbarCollapse && navbarCollapse.classList.contains('show')) {
-            if (!navbarCollapse.contains(event.target) && !navbarToggler.contains(event.target)) {
-                navbarToggler.click();
-            }
-        }
+    sections.forEach(section => {
+        section.classList.add('reveal');
     });
     
-    // Auto-close mobile menu on link click
-    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const navbarCollapse = document.querySelector('.navbar-collapse');
-            const navbarToggler = document.querySelector('.navbar-toggler');
-            if (navbarCollapse && navbarCollapse.classList.contains('show')) {
-                navbarToggler.click();
-            }
+    // Trigger reveal check
+    setTimeout(reveal, 100);
+});
+
+// Page Load Animation
+window.addEventListener('load', function() {
+    document.body.style.opacity = '0';
+    setTimeout(function() {
+        document.body.style.transition = 'opacity 0.5s ease';
+        document.body.style.opacity = '1';
+    }, 100);
+});
+
+// Image Lazy Loading with Fade Effect
+if ('loading' in HTMLImageElement.prototype) {
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    images.forEach(img => {
+        img.addEventListener('load', function() {
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.style.transition = 'opacity 0.5s ease';
+                img.style.opacity = '1';
+            }, 50);
         });
     });
-    
-    // Auto-hide alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+}
+
+// Add hover effect to social links
+document.addEventListener('DOMContentLoaded', function() {
+    const socialLinks = document.querySelectorAll('.social-links a');
+    socialLinks.forEach(link => {
+        link.classList.add('social-link');
+    });
+});
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
+// Add animation to buttons on click
+document.querySelectorAll('.btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        let ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        this.appendChild(ripple);
+        
+        let x = e.clientX - e.target.offsetLeft;
+        let y = e.clientY - e.target.offsetTop;
+        
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
+    });
+});
+
+// Form validation enhancement
+const forms = document.querySelectorAll('.needs-validation');
+forms.forEach(form => {
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    }, false);
+});
+
+// Auto-hide alerts after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
         setTimeout(() => {
             const bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();
         }, 5000);
     });
-    
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                e.preventDefault();
-                const navbarHeight = document.querySelector('.navbar').offsetHeight;
-                const targetPosition = target.offsetTop - navbarHeight - 20;
-                
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-    
-    // Form validation
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-        }, false);
-    });
-    
-    // Confirm delete
-    const deleteLinks = document.querySelectorAll('.delete-confirm');
-    deleteLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to delete this item?')) {
-                e.preventDefault();
-            }
-        });
-    });
-    
-    // Image preview
-    const imageInputs = document.querySelectorAll('input[type="file"][accept="image/*"]');
-    imageInputs.forEach(input => {
-        input.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById(input.id + '-preview');
-                    if (preview) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    });
-    
-    // Tooltip initialization
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-    
-    // Popover initialization
-    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
+});
+
+// Preloader (if you add a preloader element)
+window.addEventListener('load', function() {
+    const preloader = document.querySelector('.preloader');
+    if (preloader) {
+        preloader.style.opacity = '0';
+        setTimeout(() => {
+            preloader.style.display = 'none';
+        }, 500);
+    }
+});
+
+// Parallax effect for hero section
+window.addEventListener('scroll', function() {
+    const hero = document.querySelector('.hero-section');
+    if (hero) {
+        const scrolled = window.pageYOffset;
+        hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+    }
+});
+
+// Add loading state to forms
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function() {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            submitBtn.disabled = true;
+            
+            // Re-enable after 3 seconds (in case of error)
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 3000);
+        }
     });
 });
 
-// Copy to clipboard function
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        alert('Copied to clipboard!');
-    }, function(err) {
-        console.error('Failed to copy: ', err);
+// Counter animation for numbers
+function animateCounter(element) {
+    const target = parseInt(element.getAttribute('data-target'));
+    const duration = 2000;
+    const increment = target / (duration / 16);
+    let current = 0;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            element.textContent = target;
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(current);
+        }
+    }, 16);
+}
+
+// Observe elements for counter animation
+const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            counterObserver.unobserve(entry.target);
+        }
     });
-}
+});
 
-// Print function
-function printPage() {
-    window.print();
-}
+document.querySelectorAll('.counter').forEach(counter => {
+    counterObserver.observe(counter);
+});
 
-// Loading spinner
-function showLoading() {
-    const loader = document.createElement('div');
-    loader.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50';
-    loader.id = 'page-loader';
-    loader.innerHTML = '<div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>';
-    document.body.appendChild(loader);
-}
-
-function hideLoading() {
-    const loader = document.getElementById('page-loader');
-    if (loader) {
-        loader.remove();
+// Add ripple effect CSS dynamically
+const style = document.createElement('style');
+style.textContent = `
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple-animation 0.6s ease-out;
+        pointer-events: none;
     }
-}
-
-// Export to CSV
-function exportTableToCSV(tableId, filename = 'export.csv') {
-    const table = document.getElementById(tableId);
-    if (!table) return;
     
-    let csv = [];
-    const rows = table.querySelectorAll('tr');
-    
-    rows.forEach(row => {
-        const cols = row.querySelectorAll('td, th');
-        const csvRow = [];
-        cols.forEach(col => {
-            csvRow.push('"' + col.innerText.replace(/"/g, '""') + '"');
-        });
-        csv.push(csvRow.join(','));
-    });
-    
-    const csvContent = csv.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    window.URL.revokeObjectURL(url);
-}
+    @keyframes ripple-animation {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
